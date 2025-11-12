@@ -46,15 +46,31 @@ This starts the Flask API server, which loads the pre-trained gb_model.pkl to se
 
 ```
 python predict.py
-The server will be running at http://0.0.0.0:9696 (or http://localhost:9696).
 ```
+The server will be running at http://0.0.0.0:9696 (or http://localhost:9696).
 
 2. Test the Prediction Server
 While the server is running (in a separate terminal), you can run the test script to send a sample request.
 
 ```
 python predict_test.py
-You should see a JSON response with a prediction, like: {'predictions': [55.918...]}
+```
+You should see a JSON response with a prediction, like: {'predictions': [55.918...]}.
+The test script sends the following JSON data to the /predict endpoint. 
+You can use this structure for your own requests and change parameters as you wish:
+
+```json
+{
+  "datetime": "2011-01-01 00:00:00",
+  "season": 1,
+  "holiday": 0,
+  "workingday": 0,
+  "weather": 1,
+  "temp": 9.84,
+  "atemp": 14.395,
+  "humidity": 81,
+  "windspeed": 0.0
+}
 ```
 
 3. (Optional) Re-train the Model
@@ -66,22 +82,39 @@ python train.py
 
 This will load train.csv, run the preprocessing and cross-validation, and save a new gb_model.pkl file.
 
+## 🐳 Alternative Usage (Docker)
+You can also build and run this project as a Docker container using the provided Dockerfile .
+
+Build the Docker Image From the root of the repository, run:
+
+```
+docker build -t bike-predictor .
+```
+
+Run the Docker Container This command runs the container and maps your local port 9696 to the container's port 9696 .
+
+```
+docker run -d -p 9696:9696 bike-predictor
+```
+
+The prediction server is now running and accessible at http://localhost:9696/predict. You can test it using predict_test.py as shown in the local usage section.
+
 ## Data fields
-datetime - hourly date + timestamp  
-season -  1 = spring, 2 = summer, 3 = fall, 4 = winter 
-holiday - whether the day is considered a holiday
-workingday - whether the day is neither a weekend nor holiday
-weather - 1: Clear, Few clouds, Partly cloudy, Partly cloudy
-2: Mist + Cloudy, Mist + Broken clouds, Mist + Few clouds, Mist
-3: Light Snow, Light Rain + Thunderstorm + Scattered clouds, Light Rain + Scattered clouds
-4: Heavy Rain + Ice Pallets + Thunderstorm + Mist, Snow + Fog 
-temp - temperature in Celsius
-atemp - "feels like" temperature in Celsius
-humidity - relative humidity
-windspeed - wind speed
-casual - number of non-registered user rentals initiated
-registered - number of registered user rentals initiated
-count - number of total rentals
+* datetime - hourly date + timestamp  
+* season -  1 = spring, 2 = summer, 3 = fall, 4 = winter 
+* holiday - whether the day is considered a holiday
+* workingday - whether the day is neither a weekend nor holiday
+* weather - 1: Clear, Few clouds, Partly cloudy, Partly cloudy
+- 2: Mist + Cloudy, Mist + Broken clouds, Mist + Few clouds, Mist
+- 3: Light Snow, Light Rain + Thunderstorm + Scattered clouds, Light Rain + Scattered clouds
+- 4: Heavy Rain + Ice Pallets + Thunderstorm + Mist, Snow + Fog 
+* temp - temperature in Celsius
+* atemp - "feels like" temperature in Celsius
+* humidity - relative humidity
+* windspeed - wind speed
+* casual - number of non-registered user rentals initiated
+* registered - number of registered user rentals initiated
+* count - number of total rentals
 
 ## Evaluation metrics
 Submissions are evaluated one the Root Mean Squared Logarithmic Error (RMSLE). The RMSLE is calculated as
